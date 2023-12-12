@@ -1,0 +1,9 @@
+/data
+/runs
+/scripts
+/dist
+/build
+/*.egg-info
+/flagged
+version.py
+__pycache__
