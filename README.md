@@ -62,7 +62,7 @@ data
 Though the denoiser is trained jointly with the enhancer, it is recommended for a warmup training first.
 
 ```bash
-python -m resemble_enhance.denoiser.train --yaml config/denoiser.yaml
+python -m resemble_enhance.denoiser.train --yaml config/denoiser.yaml runs/denoiser
 ```
 
 #### Enhancer
@@ -72,11 +72,11 @@ Then, you can train the enhancer in two stages. The first stage is to train the 
 ##### Stage 1
 
 ```bash
-python -m resemble_enhance.enhancer.train --yaml config/enhancer_stage1.yaml
+python -m resemble_enhance.enhancer.train --yaml config/enhancer_stage1.yaml runs/enhancer_stage1
 ```
 
 ##### Stage 2
 
 ```bash
-python -m resemble_enhance.enhancer.train --yaml config/enhancer_stage2.yaml
+python -m resemble_enhance.enhancer.train --yaml config/enhancer_stage2.yaml runs/enhancer_stage2
 ```
