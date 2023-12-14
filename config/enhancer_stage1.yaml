@@ -1,5 +1,4 @@
 lcfm_training_mode: ae
 load_fg_only: true
 batch_size_per_gpu: 16
-# Uncomment this if you are training your model
-# denoiser_run_dir: runs/denoiser
+denoiser_run_dir: runs/denoiser

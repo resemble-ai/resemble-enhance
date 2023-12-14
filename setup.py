@@ -10,8 +10,8 @@ def shell(*args):
     return out.decode("ascii").strip()
 
 
-def write_version(version_core, dev=True):
-    if dev:
+def write_version(version_core, pre_release=True):
+    if pre_release:
         last_commit_time = shell("git", "log", "-1", "--format=%cd", "--date=iso-strict")
         last_commit_time = datetime.strptime(last_commit_time, "%Y-%m-%dT%H:%M:%S%z")
         last_commit_time = last_commit_time.astimezone(timezone.utc)
@@ -36,7 +36,7 @@ with open("requirements.txt", "r") as f:
 setup(
     name="resemble-enhance",
     python_requires=">=3.10",
-    version=write_version("0.0.1"),
+    version=write_version("0.0.1", pre_release=False),
     description="Speech denoising and enhancement with deep learning",
     long_description=long_description,
     long_description_content_type="text/markdown",

@@ -42,6 +42,8 @@ class RandomRIR(Effect):
         return rir
 
     def apply(self, wav, sr):
+        # ref: https://github.com/haoheliu/voicefixer_main/blob/b06e07c945ac1d309b8a57ddcd599ca376b98cd9/dataloaders/augmentation/magical_effects.py#L158
+
         if len(self.rir_paths) == 0:
             return wav
 

@@ -1,5 +1,6 @@
 import argparse
 import random
+import time
 from pathlib import Path
 
 import torch
@@ -70,6 +71,8 @@ def main():
 
     args = parser.parse_args()
 
+    start_time = time.perf_counter()
+
     run_dir = args.run_dir
 
     paths = sorted(args.in_dir.glob(f"**/*{args.suffix}"))
@@ -110,6 +113,10 @@ def main():
             )
         out_path.parent.mkdir(parents=True, exist_ok=True)
         torchaudio.save(out_path, hwav[None], sr)
+
+    # Cool emoji effect saying the job is done
+    elapsed_time = time.perf_counter() - start_time
+    print(f"🌟 Enhancement done! {len(paths)} files processed in {elapsed_time:.2f}s")
 
 
 if __name__ == "__main__":

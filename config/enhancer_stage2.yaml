@@ -4,6 +4,5 @@ training_seconds: 3.0
 gan_training_start_step: null
 lcfm_z_scale: 6
 praat_augment_prob: 0.2
-# Uncomment this if you are training your model
-# enhancer_stage1_run_dir: runs/enhancer_stage1
-# denoiser_run_dir: runs/denoiser
+denoiser_run_dir: runs/denoiser
+enhancer_stage1_run_dir: runs/enhancer_stage1
