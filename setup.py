@@ -36,7 +36,7 @@ with open("requirements.txt", "r") as f:
 setup(
     name="resemble-enhance",
     python_requires=">=3.10",
-    version=write_version("0.0.1", pre_release=False),
+    version=write_version("0.0.2", pre_release=True),
     description="Speech denoising and enhancement with deep learning",
     long_description=long_description,
     long_description_content_type="text/markdown",

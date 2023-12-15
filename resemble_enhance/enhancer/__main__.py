@@ -71,6 +71,12 @@ def main():
 
     args = parser.parse_args()
 
+    device = args.device
+
+    if device == "cuda" and not torch.cuda.is_available():
+        print("CUDA is not available but --device is set to cuda, using CPU instead")
+        device = "cpu"
+
     start_time = time.perf_counter()
 
     run_dir = args.run_dir
@@ -97,14 +103,14 @@ def main():
             hwav, sr = denoise(
                 dwav=dwav,
                 sr=sr,
-                device=args.device,
+                device=device,
                 run_dir=args.run_dir,
             )
         else:
             hwav, sr = enhance(
                 dwav=dwav,
                 sr=sr,
-                device=args.device,
+                device=device,
                 nfe=args.nfe,
                 solver=args.solver,
                 lambd=args.lambd,

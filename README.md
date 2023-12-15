@@ -12,8 +12,16 @@ Resemble Enhance is an AI-powered tool that aims to improve the overall quality 
 
 ### Installation
 
+Install the stable version:
+
 ```bash
-pip install resemble-enhance
+pip install resemble-enhance --upgrade
+```
+
+Or try the latest pre-release version:
+
+```bash
+pip install resemble-enhance --upgrade --pre
 ```
 
 ### Enhance
