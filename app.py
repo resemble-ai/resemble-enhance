@@ -12,6 +12,12 @@ else:
 
 def _fn(path, solver, nfe, tau, denoising):
     if path is None:
+        gr.Warning("Please upload an audio file.")
+        return None, None
+
+    info = torchaudio.info(path)
+    if info.num_frames / info.sample_rate > 60:
+        gr.Warning("Only audio files shorter than 60 seconds are supported.")
         return None, None
 
     solver = solver.lower()
