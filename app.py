@@ -1,3 +1,6 @@
+import argparse
+from functools import partial
+
 import gradio as gr
 import torch
 import torchaudio
@@ -10,13 +13,13 @@ else:
     device = "cpu"
 
 
-def _fn(path, solver, nfe, tau, denoising):
+def _fn(path, solver, nfe, tau, denoising, unlimited):
     if path is None:
         gr.Warning("Please upload an audio file.")
         return None, None
 
     info = torchaudio.info(path)
-    if info.num_frames / info.sample_rate > 60:
+    if not unlimited and (info.num_frames / info.sample_rate > 60):
         gr.Warning("Only audio files shorter than 60 seconds are supported.")
         return None, None
 
@@ -37,12 +40,35 @@ def _fn(path, solver, nfe, tau, denoising):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--unlimited", action="store_true")
+    args = parser.parse_args()
+
     inputs: list = [
         gr.Audio(type="filepath", label="Input Audio"),
-        gr.Dropdown(choices=["Midpoint", "RK4", "Euler"], value="Midpoint", label="CFM ODE Solver"),
-        gr.Slider(minimum=1, maximum=128, value=64, step=1, label="CFM Number of Function Evaluations"),
-        gr.Slider(minimum=0, maximum=1, value=0.5, step=0.01, label="CFM Prior Temperature"),
-        gr.Checkbox(value=False, label="Denoise Before Enhancement"),
+        gr.Dropdown(
+            choices=["Midpoint", "RK4", "Euler"],
+            value="Midpoint",
+            label="CFM ODE Solver (Midpoint is recommended)",
+        ),
+        gr.Slider(
+            minimum=1,
+            maximum=128,
+            value=64,
+            step=1,
+            label="CFM Number of Function Evaluations (higher values in general yield better quality but may be slower)",
+        ),
+        gr.Slider(
+            minimum=0,
+            maximum=1,
+            value=0.5,
+            step=0.01,
+            label="CFM Prior Temperature (higher values can improve quality but can reduce stability)",
+        ),
+        gr.Checkbox(
+            value=False,
+            label="Denoise Before Enhancement (tick if your audio contains heavy background noise)",
+        ),
     ]
 
     outputs: list = [
@@ -51,7 +77,7 @@ def main():
     ]
 
     interface = gr.Interface(
-        fn=_fn,
+        fn=partial(_fn, unlimited=args.unlimited),
         title="Resemble Enhance",
         description="AI-driven audio enhancement for your audio files, powered by Resemble AI.",
         inputs=inputs,
