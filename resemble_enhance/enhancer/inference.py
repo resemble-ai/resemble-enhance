@@ -1,5 +1,6 @@
 import logging
 from functools import cache
+from pathlib import Path
 
 import torch
 
@@ -11,9 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 @cache
-def load_enhancer(run_dir, device):
-    if run_dir is None:
-        run_dir = download()
+def load_enhancer(run_dir: str | Path | None, device):
+    run_dir = download(run_dir)
     hp = HParams.load(run_dir)
     enhancer = Enhancer(hp)
     path = run_dir / "ds" / "G" / "default" / "mp_rank_00_model_states.pt"
