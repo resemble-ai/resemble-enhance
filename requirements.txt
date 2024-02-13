@@ -1,5 +1,5 @@
 celluloid==0.2.0
-deepspeed==0.12.4
+deepspeed
 librosa==0.10.1
 matplotlib==3.8.1
 numpy==1.26.2
