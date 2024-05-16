@@ -28,13 +28,13 @@ pip install resemble-enhance --upgrade --pre
 ### Enhance
 
 ```
-resemble_enhance in_dir out_dir
+resemble-enhance in_dir out_dir
 ```
 
 ### Denoise only
 
 ```
-resemble_enhance in_dir out_dir --denoise_only
+resemble-enhance in_dir out_dir --denoise_only
 ```
 
 ### Web Demo
