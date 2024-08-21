@@ -14,6 +14,8 @@ from .distributed import is_global_leader
 from .engine import Engine
 from .utils import tree_map
 
+import wandb
+
 logger = logging.getLogger(__name__)
 
 
@@ -80,6 +82,13 @@ class TrainLoop:
         return path
 
     def __post_init__(self):
+        # Initialize wandb
+        wandb.init(project="resamble-enhance-kr", name=str(self.run_dir), config={
+            "update_every": self.update_every,
+            "eval_every": self.eval_every,
+            "device": self.device,
+        })
+        
         engine_G = self.load_G(self.run_dir)
         if self.load_D is None:
             engine_D = None
@@ -87,7 +96,7 @@ class TrainLoop:
             engine_D = self.load_D(self.run_dir)
         self.engine_G = engine_G
         self.engine_D = engine_D
-
+        
     @property
     def model_G(self):
         return self.engine_G.module
@@ -137,7 +146,6 @@ class TrainLoop:
                 torch.cuda.synchronize()
                 start_time = time.time()
 
-                # What's the step after this batch?
                 step = self.global_step + 1
 
                 # Send data to the GPU
@@ -145,19 +153,16 @@ class TrainLoop:
 
                 stats = {"step": step}
 
-                # Include step == 1 for sanity check
                 gan_started = gan_start_step is not None and (step >= gan_start_step or step == 1)
                 gan_started &= engine_D is not None
 
                 # Generator step
                 fake, losses = self.feed_G(engine=engine_G, batch=batch)
 
-                # Train generator
                 if gan_started:
                     assert engine_D is not None
                     assert self.feed_D is not None
 
-                    # Freeze the discriminator to let gradient go through fake
                     engine_D.freeze_()
                     losses |= self.feed_D(engine=engine_D, batch=None, fake=fake)
 
@@ -178,7 +183,6 @@ class TrainLoop:
                 engine_G.backward(loss_G)
                 engine_G.step()
 
-                # Discriminator step
                 if gan_started:
                     assert engine_D is not None
                     assert self.feed_D is not None
@@ -210,6 +214,9 @@ class TrainLoop:
                 stats["elapsed_time"] = time.time() - start_time
                 stats = tree_map(lambda x: float(f"{x:.4g}") if isinstance(x, float) else x, stats)
                 logger.info(json.dumps(stats, indent=0))
+
+                # Record stats to wandb
+                wandb.log(stats)
 
                 command = non_blocking_input()
 
