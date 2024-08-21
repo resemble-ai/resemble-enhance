@@ -83,7 +83,7 @@ class Dataset(DatasetBase):
         self.distorter = Distorter(hp, training=training, mode=mode)
 
     def _load_wav(self, path, length=None, random_crop=True):
-        wav, sr = torchaudio.load(path)
+        wav, sr = torchaudio.load(str(path))
 
         wav = AF.resample(
             waveform=wav,

@@ -16,6 +16,8 @@ Resemble Enhance is an AI-powered tool that aims to improve the overall quality 
 Install the stable version:
 
 ```bash
+conda create -n resemble python=3.10
+conda install cuda -c nvidia
 pip install resemble-enhance --upgrade
 ```
 
