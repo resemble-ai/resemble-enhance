@@ -68,6 +68,8 @@ class Enhancer(nn.Module):
         self.dummy: Tensor
         self.register_buffer("dummy", torch.zeros(1))
 
+        self.denoise = True
+
         if self.hp.enhancer_stage1_run_dir is not None:
             pretrained_path = self.hp.enhancer_stage1_run_dir / "ds/G/default/mp_rank_00_model_states.pt"
             self._load_pretrained(pretrained_path)
@@ -126,21 +128,23 @@ class Enhancer(nn.Module):
         plt.savefig(path, dpi=300)
 
     def _may_denoise(self, x: Tensor, y: Tensor | None = None):
-        if self.hp.lcfm_training_mode == "cfm":
+        if self.denoise and self.hp.lcfm_training_mode == "cfm":
             return self.denoiser(x, y)
         return x
 
-    def configurate_(self, nfe, solver, lambd, tau):
+    def configurate_(self, nfe, solver, lambd, tau, denoise=True):
         """
         Args:
             nfe: number of function evaluations
             solver: solver method
             lambd: denoiser strength [0, 1]
             tau: prior temperature [0, 1]
+            denoise: whether to apply denoising
         """
         self.lcfm.cfm.solver.configurate_(nfe, solver)
         self.lcfm.eval_tau_(tau)
         self._eval_lambd = lambd
+        self.denoise = denoise
 
     def forward(self, x: Tensor, y: Tensor | None = None, z: Tensor | None = None):
         """

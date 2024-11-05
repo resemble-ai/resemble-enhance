@@ -40,6 +40,9 @@ class Predictor(BasePredictor):
         denoise_only: bool = Input(
             description="Only apply denoising without enhancement", default=False
         ),
+        enhance_only: bool = Input(
+            description="Only apply enhancement without denoising", default=False
+        ),
         lambd: float = Input(
             description="Denoise strength for enhancement (0.0 to 1.0)", 
             ge=0, le=1.0, 
@@ -90,6 +93,16 @@ class Predictor(BasePredictor):
                                 dwav=dwav,
                                 sr=sr,
                             )
+                        elif enhance_only:
+                            hwav, sr = self.enhance(
+                                dwav=dwav,
+                                sr=sr,
+                                nfe=nfe,
+                                solver=solver,
+                                lambd=lambd,
+                                tau=tau,
+                                denoise=False
+                            )
                         else:
                             hwav, sr = self.enhance(
                                 dwav=dwav,
@@ -97,7 +110,8 @@ class Predictor(BasePredictor):
                                 nfe=nfe,
                                 solver=solver,
                                 lambd=lambd,
-                                tau=tau
+                                tau=tau,
+                                denoise=True
                             )
                         
                         # Save enhanced audio
@@ -123,6 +137,16 @@ class Predictor(BasePredictor):
                     dwav=dwav,
                     sr=sr,
                 )
+            elif enhance_only:
+                hwav, sr = self.enhance(
+                    dwav=dwav,
+                    sr=sr,
+                    nfe=nfe,
+                    solver=solver,
+                    lambd=lambd,
+                    tau=tau,
+                    denoise=False
+                )
             else:
                 hwav, sr = self.enhance(
                     dwav=dwav,
@@ -130,7 +154,8 @@ class Predictor(BasePredictor):
                     nfe=nfe,
                     solver=solver,
                     lambd=lambd,
-                    tau=tau
+                    tau=tau,
+                    denoise=True
                 )
     
             output_path = temp_dir / "enhanced.wav"
