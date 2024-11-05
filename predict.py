@@ -30,8 +30,8 @@ class Predictor(BasePredictor):
     def denoise(self, dwav, sr):
         return inference(model=self.enhancer.denoiser, dwav=dwav, sr=sr, device="cuda")
     
-    def enhance(self, dwav, sr, nfe=32, solver="midpoint", lambd=0.5, tau=0.5):
-        self.enhancer.configurate_(nfe=nfe, solver=solver, lambd=lambd, tau=tau)
+    def enhance(self, dwav, sr, nfe=32, solver="midpoint", lambd=0.5, tau=0.5, denoise=True):
+        self.enhancer.configurate_(nfe=nfe, solver=solver, lambd=lambd, tau=tau, denoise=denoise)
         return inference(model=self.enhancer, dwav=dwav, sr=sr, device="cuda")
 
     def predict(
@@ -41,7 +41,7 @@ class Predictor(BasePredictor):
             description="Only apply denoising without enhancement", default=False
         ),
         enhance_only: bool = Input(
-            description="Only apply enhancement without denoising", default=False
+            description="Only apply enhancement without denoising (will be ignored if denoise_only is True)", default=False
         ),
         lambd: float = Input(
             description="Denoise strength for enhancement (0.0 to 1.0)", 
