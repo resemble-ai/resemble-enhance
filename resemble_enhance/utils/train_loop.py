@@ -18,23 +18,19 @@ logger = logging.getLogger(__name__)
 
 
 class EvalFn(Protocol):
-    def __call__(self, engine: Engine, eval_dir: Path) -> None:
-        ...
+    def __call__(self, engine: Engine, eval_dir: Path) -> None: ...
 
 
 class EngineLoader(Protocol):
-    def __call__(self, run_dir: Path) -> Engine:
-        ...
+    def __call__(self, run_dir: Path) -> Engine: ...
 
 
 class GenFeeder(Protocol):
-    def __call__(self, engine: Engine, batch: dict[str, Tensor]) -> tuple[Tensor, dict[str, Tensor]]:
-        ...
+    def __call__(self, engine: Engine, batch: dict[str, Tensor]) -> tuple[Tensor, dict[str, Tensor]]: ...
 
 
 class DisFeeder(Protocol):
-    def __call__(self, engine: Engine, batch: dict[str, Tensor] | None, fake: Tensor) -> dict[str, Tensor]:
-        ...
+    def __call__(self, engine: Engine, batch: dict[str, Tensor] | None, fake: Tensor) -> dict[str, Tensor]: ...
 
 
 @dataclass
@@ -239,7 +235,7 @@ class TrainLoop:
     @classmethod
     def set_running_loop_(cls, loop):
         assert isinstance(loop, cls), f"Expected {cls}, got {type(loop)}"
-        cls._running_loop: cls = loop
+        cls._running_loop = loop
 
     @classmethod
     def get_running_loop(cls) -> "TrainLoop | None":

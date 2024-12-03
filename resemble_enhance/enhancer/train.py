@@ -30,7 +30,7 @@ def load_G(run_dir: Path, hp: HParams | None = None, training=True):
     return engine
 
 
-def load_D(run_dir: Path, hp: HParams):
+def load_D(run_dir: Path, hp: HParams | None):
     if hp is None:
         hp = HParams.load(run_dir)
         assert isinstance(hp, HParams)
@@ -41,8 +41,8 @@ def load_D(run_dir: Path, hp: HParams):
 
 
 def save_wav(path: Path, wav: Tensor, rate: int):
-    wav = wav.detach().cpu().numpy()
-    soundfile.write(path, wav, samplerate=rate)
+    wav_numpy = wav.detach().cpu().numpy()
+    soundfile.write(path, wav_numpy, samplerate=rate)
 
 
 def main():

@@ -185,7 +185,10 @@ class Enhancer(nn.Module):
         y_mel = _maybe(self.to_mel)(y)  # (b d t)
         y_mel = _maybe(self.normalizer)(y_mel)
 
-        lcfm_decoded = self.lcfm(x_mel_denoised, y_mel, ψ0=x_mel_original)  # (b d t)
+        if self.hp.force_gaussian_prior:
+            lcfm_decoded = self.lcfm(x_mel_denoised, y_mel, ψ0=None)  # (b d t)
+        else:
+            lcfm_decoded = self.lcfm(x_mel_denoised, y_mel, ψ0=x_mel_original)  # (b d t)
 
         if lcfm_decoded is None:
             o = None

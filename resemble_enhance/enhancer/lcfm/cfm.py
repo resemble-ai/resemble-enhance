@@ -17,8 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class VelocityField(Protocol):
-    def __call__(self, *, t: Tensor, ψt: Tensor, dt: Tensor) -> Tensor:
-        ...
+    def __call__(self, *, t: Tensor, ψt: Tensor, dt: Tensor) -> Tensor: ...
 
 
 class Solver:
