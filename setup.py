@@ -42,6 +42,11 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     install_requires=requirements,
+    extra_require={
+        "train": [
+            "deepspeed>=0.12.4",
+        ],
+    },
     url="https://github.com/resemble-ai/resemble-enhance",
     author="Resemble AI",
     author_email="team@resemble.ai",
