@@ -4,8 +4,19 @@ import torchaudio
 
 from resemble_enhance.enhancer.inference import denoise, enhance
 
+# Device configuration with optimizations for modern GPUs
 if torch.cuda.is_available():
     device = "cuda"
+    # Enable TF32 for Ampere and newer GPUs (3x speedup)
+    # Compatible with PyTorch 2.1+ using new API when available
+    if hasattr(torch.backends.cuda.matmul, 'fp32_precision'):
+        torch.backends.cuda.matmul.fp32_precision = 'tf32'
+        torch.backends.cudnn.conv.fp32_precision = 'tf32'
+    else:
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+    # Enable cuDNN autotuner
+    torch.backends.cudnn.benchmark = True
 else:
     device = "cpu"
 
