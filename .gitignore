@@ -8,3 +8,4 @@
 version.py
 __pycache__
 model_repo
+.DS_Store

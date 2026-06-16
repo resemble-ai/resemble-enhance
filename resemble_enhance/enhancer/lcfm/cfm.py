@@ -70,7 +70,8 @@ class Solver:
             return (a**t - 1) / (a - 1)
 
         # Solve h(1/n) = 0.5
-        a = float(scipy.optimize.fsolve(lambda a: h(1 / n, a) - 0.5, x0=0))
+        a = float(scipy.optimize.fsolve(lambda a: h(1 / n, a) - 0.5, x0=0)[0])
+        # Fixed scaler here for newer numpi
 
         t = h(t, a=a)
 
