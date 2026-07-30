@@ -19,15 +19,21 @@ def inference_chunk(model, dwav, sr, device, npad=441):
     del sr
 
     length = dwav.shape[-1]
-    abs_max = dwav.abs().max().clamp(min=1e-7)
 
     assert dwav.dim() == 1, f"Expected 1D waveform, got {dwav.dim()}D"
     dwav = dwav.to(device)
+    # Computed after the move, and brought back to the CPU for the unnormalize
+    # below. Taking it from the caller's tensor instead meant a CUDA-resident
+    # input produced a CUDA `abs_max`, which then met a `.cpu()` result on the
+    # last line and raised "Expected all tensors to be on the same device".
+    # Callers had to pass CPU tensors and pass the GPU separately as `device`,
+    # which nothing documented.
+    abs_max = dwav.abs().max().clamp(min=1e-7)
     dwav = dwav / abs_max  # Normalize
     dwav = F.pad(dwav, (0, npad))
     hwav = model(dwav[None])[0].cpu()  # (T,)
     hwav = hwav[:length]  # Trim padding
-    hwav = hwav * abs_max  # Unnormalize
+    hwav = hwav * abs_max.cpu()  # Unnormalize
 
     return hwav
 

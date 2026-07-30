@@ -69,8 +69,11 @@ class Solver:
         def h(t, a):
             return (a**t - 1) / (a - 1)
 
-        # Solve h(1/n) = 0.5
-        a = float(scipy.optimize.fsolve(lambda a: h(1 / n, a) - 0.5, x0=0))
+        # Solve h(1/n) = 0.5. `fsolve` returns a shape-(1,) array; numpy 2
+        # removed the implicit size-1-array-to-scalar conversion, so `float()`
+        # on it raises "only 0-dimensional arrays can be converted to Python
+        # scalars" and takes the whole enhancement pass with it.
+        a = float(scipy.optimize.fsolve(lambda a: h(1 / n, a) - 0.5, x0=0)[0])
 
         t = h(t, a=a)
 
