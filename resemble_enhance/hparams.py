@@ -2,6 +2,7 @@ import logging
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+import yaml
 from omegaconf import OmegaConf
 from rich.console import Console
 from rich.panel import Panel
@@ -10,6 +11,18 @@ from rich.table import Table
 logger = logging.getLogger(__name__)
 
 console = Console()
+
+
+class _PathLoader(yaml.SafeLoader):
+    """SafeLoader that reads pathlib tags written on any OS, e.g. PosixPath on Windows."""
+
+
+def _construct_path(loader, node):
+    return str(Path(*loader.construct_sequence(node)))
+
+
+for _name in ("Path", "PosixPath", "WindowsPath", "PurePath", "PurePosixPath", "PureWindowsPath"):
+    _PathLoader.add_constructor(f"tag:yaml.org,2002:python/object/apply:pathlib.{_name}", _construct_path)
 
 
 def _make_stft_cfg(hop_length, win_length=None):
@@ -90,8 +103,10 @@ class HParams:
     @classmethod
     def from_yaml(cls, path: Path) -> "HParams":
         logger.info(f"Reading hparams from {path}")
+        with open(path, encoding="utf-8") as f:
+            cfg = OmegaConf.create(yaml.load(f, Loader=_PathLoader))
         # First merge to fix types (e.g., str -> Path)
-        return cls(**dict(OmegaConf.merge(cls(), OmegaConf.load(path))))
+        return cls(**dict(OmegaConf.merge(cls(), cfg)))
 
     def save_if_not_exists(self, run_dir: Path):
         path = run_dir / "hparams.yaml"
@@ -99,7 +114,9 @@ class HParams:
             logger.info(f"{path} already exists, not saving")
             return
         path.parent.mkdir(parents=True, exist_ok=True)
-        OmegaConf.save(asdict(self), str(path))
+        # Save paths as plain strings so the yaml loads on any OS
+        data = {k: str(v) if isinstance(v, Path) else v for k, v in asdict(self).items()}
+        OmegaConf.save(data, str(path))
 
     @classmethod
     def load(cls, run_dir, yaml: Path | None = None):
